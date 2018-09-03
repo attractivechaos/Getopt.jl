@@ -2,13 +2,13 @@ module Getopt
 
 export getopt
 
-struct Getopt
+struct GetoptIter
 	args::Array{String}
 	ostr::String
 	longopts::Array{String}
 end
 
-function Base.iterate(g::Getopt, (pos, ind) = (1, 1))
+function Base.iterate(g::GetoptIter, (pos, ind) = (1, 1))
 	if g.ostr[1] != '+' # allow options to appear after main arguments
 		while ind <= length(g.args) && (g.args[ind][1] != '-' || g.args[ind] == "-")
 			ind += 1
@@ -78,10 +78,12 @@ non-option arguments. If `ostr[1]=='+'`, the default behavior is disabled.
 
 # Examples
 ```julia
-for (opt, arg) in Klib.getopt(ARGS, "xy:", ["foo", "bar="])
+for (opt, arg) in Getopt.getopt(ARGS, "xy:", ["foo", "bar="])
 	@show (opt, arg)
 end
 @show ARGS # only non-option arguments remain
 ```
 """
-getopt(args::Array{String}, ostr::String, longopts::Array{String} = String[]) = Getopt(args, ostr, longopts)
+getopt(args::Array{String}, ostr::String, longopts::Array{String} = String[]) = GetoptIter(args, ostr, longopts)
+
+end
