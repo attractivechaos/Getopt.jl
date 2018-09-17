@@ -8,13 +8,13 @@ struct GetoptIter
 	longopts::Array{String}
 end
 
-function Base.iterate(g::GetoptIter, (pos, ind) = (1, 1))
+function Base.iterate(g::GetoptIter, (pos, ind) = (firstindex(g.args), 1))
 	if g.ostr[1] != '+' # allow options to appear after main arguments
-		while ind <= length(g.args) && (g.args[ind][1] != '-' || g.args[ind] == "-")
+		while ind <= lastindex(g.args) && (g.args[ind][1] != '-' || g.args[ind] == "-")
 			ind += 1
 		end
 	end
-	if ind > length(g.args) || g.args[ind][1] != '-' || g.args[ind] == "-" return nothing end
+	if ind > lastindex(g.args) || g.args[ind][1] != '-' || g.args[ind] == "-" return nothing end
 	if length(g.args[ind]) >= 2 && g.args[ind][1] == '-' && g.args[ind][2] == '-'
 		if length(g.args[ind]) == 2 # actually, Julia will always filter out "--" in ARGS. Ugh!
 			deleteat!(g.args, ind)
@@ -27,7 +27,7 @@ function Base.iterate(g::GetoptIter, (pos, ind) = (1, 1))
 			n_matches, match = 0, ""
 			for l in g.longopts
 				r = findfirst(a, l)
-				if r != nothing && collect(r)[1] == 1
+				if r != nothing && r[1] == 1
 					n_matches += 1
 					match = l
 				end
@@ -36,7 +36,7 @@ function Base.iterate(g::GetoptIter, (pos, ind) = (1, 1))
 				optopt = string("--", match[end] == '=' ? match[1:end-1] : match);
 				if eqpos != nothing
 					optarg = g.args[ind][eqpos+1:end]
-				elseif match[end] == '=' && ind + 1 <= length(g.args)
+				elseif match[end] == '=' && ind + 1 <= lastindex(g.args)
 					deleteat!(g.args, ind)
 					optarg = g.args[ind]
 				end
@@ -52,7 +52,7 @@ function Base.iterate(g::GetoptIter, (pos, ind) = (1, 1))
 		elseif i < length(g.ostr) && g.ostr[i + 1] == ':' # require argument
 			if pos <= length(g.args[ind])
 				optarg = g.args[ind][pos:end]
-			elseif ind + 1 <= length(g.args)
+			elseif ind + 1 <= lastindex(g.args)
 				deleteat!(g.args, ind)
 				optarg = g.args[ind]
 			end
