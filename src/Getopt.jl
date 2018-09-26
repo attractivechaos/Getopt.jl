@@ -78,7 +78,7 @@ non-option arguments. If `ostr[1]=='+'`, the default behavior is disabled.
 
 # Examples
 ```julia
-for (opt, arg) in Getopt.getopt(ARGS, "xy:", ["foo", "bar="])
+for (opt, arg) in getopt(ARGS, "xy:", ["foo", "bar="])
 	@show (opt, arg)
 end
 @show ARGS # only non-option arguments remain
